@@ -1,0 +1,9 @@
+configobj~=5.0.6
+pandas~=1.1.4
+SQLAlchemy~=1.3.20
+fuzzymatcher~=0.0.5
+gspread~=3.7.0
+oauth2client~=4.1.3
+google-api-python-client~=1.6.7
+df2gspread~=1.0.4
+python-decouple~=3.4
