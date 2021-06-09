@@ -65,6 +65,7 @@ class FuzzyAutoMapper:
         data_dict['folio'] = matcher['folio']
         data_dict['unit_name_trk'] = matcher['unit_name_trk']
         data_dict['unit_code_trk'] = matcher['unit_code_trk']
+        data_dict['short_name_trk'] = matcher['short_name_trk']
         data_dict['cabin_id'] = matcher['cabin_id']
         df_out = pd.DataFrame(data_dict)
 

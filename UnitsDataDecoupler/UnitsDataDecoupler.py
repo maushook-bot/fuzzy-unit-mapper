@@ -70,14 +70,18 @@ class CoupleDecouple:
                     WHERE coalesce(um.unit_code_src, 0) = um.unit_code_trk
                     OR coalesce(um.unit_name_src, 0) = um.unit_name_trk
                     OR coalesce(um.unit_code_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk;
+                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk
+                    OR coalesce(um.unit_code_src, 0) = um.short_name_trk
+                    OR coalesce(um.unit_name_src, 0) = um.short_name_trk;
             """
             c_sql = f"""
                     SELECT COUNT(1) FROM tia_{self.migration_phase}_distinct_unit_processing um
                     WHERE coalesce(um.unit_code_src, 0) = um.unit_code_trk
                     OR coalesce(um.unit_name_src, 0) = um.unit_name_trk
                     OR coalesce(um.unit_code_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk;
+                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk
+                    OR coalesce(um.unit_code_src, 0) = um.short_name_trk
+                    OR coalesce(um.unit_name_src, 0) = um.short_name_trk;
             """ 
 
             df_out = pd.read_sql(sql, con=self.local)
@@ -98,7 +102,10 @@ class CoupleDecouple:
                     WHERE (coalesce(um.unit_code_src, 0) <> um.unit_code_trk
                     and coalesce(um.unit_name_src, 0) <> um.unit_name_trk
                     and coalesce(um.unit_code_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk)
+                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk
+                    and coalesce(um.unit_code_src, 0) <> um.short_name_trk
+                    and coalesce(um.unit_name_src, 0) <> um.short_name_trk
+                    )
                     or (um.cabin_id IS NULL);
             """
             c_sql = f"""
@@ -106,7 +113,10 @@ class CoupleDecouple:
                     WHERE (coalesce(um.unit_code_src, 0) <> um.unit_code_trk
                     and coalesce(um.unit_name_src, 0) <> um.unit_name_trk
                     and coalesce(um.unit_code_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk)
+                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk
+                    and coalesce(um.unit_code_src, 0) <> um.short_name_trk
+                    and coalesce(um.unit_name_src, 0) <> um.short_name_trk
+                    )
                     or (um.cabin_id IS NULL);
             """
 
@@ -131,7 +141,9 @@ class CoupleDecouple:
                     WHERE coalesce(um.unit_code_src, 0) = um.unit_code_trk
                     OR coalesce(um.unit_name_src, 0) = um.unit_name_trk
                     OR coalesce(um.unit_code_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk;
+                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk
+                    OR coalesce(um.unit_code_src, 0) = um.short_name_trk
+                    OR coalesce(um.unit_name_src, 0) = um.short_name_trk;
             """ 
 
             df_count = pd.read_sql(c_sql, con=self.local)
@@ -151,7 +163,10 @@ class CoupleDecouple:
                     WHERE (coalesce(um.unit_code_src, 0) <> um.unit_code_trk
                     and coalesce(um.unit_name_src, 0) <> um.unit_name_trk
                     and coalesce(um.unit_code_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk)
+                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk
+                    and coalesce(um.unit_code_src, 0) <> um.short_name_trk
+                    and coalesce(um.unit_name_src, 0) <> um.short_name_trk
+                    )
                     or (um.cabin_id IS NULL);
             """
 
