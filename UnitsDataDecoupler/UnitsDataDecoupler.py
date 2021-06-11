@@ -37,7 +37,7 @@ class CoupleDecouple:
         self.GSHEET_META_ID = GSHEET_ID
 
         # Intialize the data dict:-
-        self.data_dict = {'unit_stats_id': pd.Series([], dtype='int'),'folio': pd.Series([], dtype='int'), 
+        self.data_dict = {'unit_stats_id': pd.Series([], dtype='int'),'folio': pd.Series([], dtype='str'), 
                      'unit_name_src': pd.Series([], dtype='str'), 'unit_code_src': pd.Series([], dtype='str'), 
                      'unit_name_trk': pd.Series([], dtype='str'), 'unit_code_trk': pd.Series([], dtype='str'), 
                      'short_name_trk': pd.Series([], dtype='str'), 'cabin_id': pd.Series([], dtype='int')}
@@ -55,6 +55,12 @@ class CoupleDecouple:
             df.to_sql(f"tia_{self.migration_phase}_distinct_unit_processing", con=self.local, index=False, if_exists="replace")
             df.to_sql(f"tia_{self.migration_phase}_distinct_unit_processing", con=self.stage, index=False, if_exists="replace")
 
+            c_sql = f""" 
+                    SELECT COUNT(1) FROM tia_{self.migration_phase}_distinct_unit_processing;
+            """ 
+            df_count = pd.read_sql(c_sql, con=self.local)
+            print("Count: ", df_count['COUNT(1)'][0])
+
         else:
             print("Duplicating API Output data: Disabled")
 
@@ -67,21 +73,21 @@ class CoupleDecouple:
                     um.unit_name_src, um.unit_code_src, 
                     um.unit_name_trk, um.short_name_trk, um.unit_code_trk, um.cabin_id
                     FROM tia_{self.migration_phase}_unit_processing um
-                    WHERE coalesce(um.unit_code_src, 0) = um.unit_code_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_code_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk
-                    OR coalesce(um.unit_code_src, 0) = um.short_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.short_name_trk;
+                    WHERE coalesce(um.unit_code_src, 0) = coalesce(um.unit_code_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.unit_name_trk, 0)
+                    OR coalesce(um.unit_code_src, 0) = coalesce(um.unit_name_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.unit_code_trk, 0)
+                    OR coalesce(um.unit_code_src, 0) = coalesce(um.short_name_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.short_name_trk, 0);
             """
             c_sql = f"""
                     SELECT COUNT(1) FROM tia_{self.migration_phase}_distinct_unit_processing um
-                    WHERE coalesce(um.unit_code_src, 0) = um.unit_code_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_code_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk
-                    OR coalesce(um.unit_code_src, 0) = um.short_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.short_name_trk;
+                    WHERE coalesce(um.unit_code_src, 0) = coalesce(um.unit_code_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.unit_name_trk, 0)
+                    OR coalesce(um.unit_code_src, 0) = coalesce(um.unit_name_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.unit_code_trk, 0)
+                    OR coalesce(um.unit_code_src, 0) = coalesce(um.short_name_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.short_name_trk, 0);
             """ 
 
             df_out = pd.read_sql(sql, con=self.local)
@@ -99,23 +105,23 @@ class CoupleDecouple:
                     um.unit_name_src, um.unit_code_src,
                     um.unit_name_trk, um.short_name_trk, um.unit_code_trk, um.cabin_id
                     FROM tia_{self.migration_phase}_unit_processing um
-                    WHERE (coalesce(um.unit_code_src, 0) <> um.unit_code_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_code_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk
-                    and coalesce(um.unit_code_src, 0) <> um.short_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.short_name_trk
+                    WHERE (coalesce(um.unit_code_src, 0) <> coalesce(um.unit_code_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.unit_name_trk, 0)
+                    and coalesce(um.unit_code_src, 0) <> coalesce(um.unit_name_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.unit_code_trk, 0)
+                    and coalesce(um.unit_code_src, 0) <> coalesce(um.short_name_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.short_name_trk, 0)
                     )
                     or (um.cabin_id IS NULL);
             """
             c_sql = f"""
                     SELECT COUNT(1) FROM tia_{self.migration_phase}_distinct_unit_processing um
-                    WHERE (coalesce(um.unit_code_src, 0) <> um.unit_code_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_code_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk
-                    and coalesce(um.unit_code_src, 0) <> um.short_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.short_name_trk
+                    WHERE (coalesce(um.unit_code_src, 0) <> coalesce(um.unit_code_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.unit_name_trk, 0)
+                    and coalesce(um.unit_code_src, 0) <> coalesce(um.unit_name_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.unit_code_trk, 0)
+                    and coalesce(um.unit_code_src, 0) <> coalesce(um.short_name_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.short_name_trk, 0)
                     )
                     or (um.cabin_id IS NULL);
             """
@@ -138,12 +144,12 @@ class CoupleDecouple:
             print("$ 1. Moving Matched Units <-- Gsheet $")
             c_sql = f"""
                     SELECT COUNT(1) FROM tia_{self.migration_phase}_distinct_unit_processing um
-                    WHERE coalesce(um.unit_code_src, 0) = um.unit_code_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_code_src, 0) = um.unit_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.unit_code_trk
-                    OR coalesce(um.unit_code_src, 0) = um.short_name_trk
-                    OR coalesce(um.unit_name_src, 0) = um.short_name_trk;
+                    WHERE coalesce(um.unit_code_src, 0) = coalesce(um.unit_code_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.unit_name_trk, 0)
+                    OR coalesce(um.unit_code_src, 0) = coalesce(um.unit_name_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.unit_code_trk, 0)
+                    OR coalesce(um.unit_code_src, 0) = coalesce(um.short_name_trk, 0)
+                    OR coalesce(um.unit_name_src, 0) = coalesce(um.short_name_trk, 0);
             """ 
 
             df_count = pd.read_sql(c_sql, con=self.local)
@@ -160,12 +166,12 @@ class CoupleDecouple:
             print("$ -1. Moving Missing Units <-- Gsheet $")
             c_sql = f"""
                     SELECT COUNT(1) FROM tia_{self.migration_phase}_distinct_unit_processing um
-                    WHERE (coalesce(um.unit_code_src, 0) <> um.unit_code_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_code_src, 0) <> um.unit_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.unit_code_trk
-                    and coalesce(um.unit_code_src, 0) <> um.short_name_trk
-                    and coalesce(um.unit_name_src, 0) <> um.short_name_trk
+                    WHERE (coalesce(um.unit_code_src, 0) <> coalesce(um.unit_code_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.unit_name_trk, 0)
+                    and coalesce(um.unit_code_src, 0) <> coalesce(um.unit_name_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.unit_code_trk, 0)
+                    and coalesce(um.unit_code_src, 0) <> coalesce(um.short_name_trk, 0)
+                    and coalesce(um.unit_name_src, 0) <> coalesce(um.short_name_trk, 0)
                     )
                     or (um.cabin_id IS NULL);
             """
@@ -199,37 +205,37 @@ class CoupleDecouple:
                 f"""
                 UPDATE src_{self.migration_phase}_units_map um
                 SET um.unit_name_src = NULL
-                WHERE um.unit_name_src = 'None';
+                WHERE (um.unit_name_src = 'None' or um.unit_name_src = '') ;
                 """
             unit_code_src = \
                 f"""
                 UPDATE src_{self.migration_phase}_units_map um
                 SET um.unit_code_src = NULL
-                WHERE um.unit_code_src = 'None';
+                WHERE (um.unit_code_src = 'None' or um.unit_code_src = '');
                 """
             unit_name_trk = \
                 f"""
                 UPDATE src_{self.migration_phase}_units_map um
                 SET um.unit_name_trk = NULL
-                WHERE um.unit_name_trk = 'None';
+                WHERE (um.unit_name_trk = 'None' or um.unit_name_trk = '');
                 """
             unit_code_trk = \
                 f"""
                 UPDATE src_{self.migration_phase}_units_map um
                 SET um.unit_code_trk = NULL
-                WHERE um.unit_code_trk = 'None';
+                WHERE (um.unit_code_trk = 'None' or um.unit_code_trk = '');
                 """
             short_name_trk = \
                 f"""
                 UPDATE src_{self.migration_phase}_units_map um
                 SET um.short_name_trk = NULL
-                WHERE um.short_name_trk = 'None';
+                WHERE (um.short_name_trk = 'None' OR um.short_name_trk = '');
                 """
             cabin_id = \
                 f"""
                 UPDATE src_{self.migration_phase}_units_map um
                 SET um.cabin_id = NULL
-                WHERE (um.cabin_id = 'None' OR um.cabin_id = 'nan');
+                WHERE (um.cabin_id = 'None' OR um.cabin_id = 'nan' OR um.cabin_id = '');
                 """
            
             self.local.execute(unit_name_src)
@@ -252,7 +258,7 @@ class CoupleDecouple:
 
     def folio_resolver(self):
         if self.process_flow == "read_gsheet":
-            data_dict = {'folio': pd.Series([], dtype='int'),
+            data_dict = {'folio': pd.Series([], dtype='str'),
                          'cabin_id': pd.Series([], dtype='int')}
             df = pd.DataFrame(data_dict)
             df.to_sql(f"tia_{self.migration_phase}_unit_map", con=self.local, index=False, if_exists="replace")

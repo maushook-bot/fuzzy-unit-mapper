@@ -12,11 +12,19 @@ The Reservation and folios table at the TRACK side requires the reservation_id t
 Fuzzy logic is employed which levenshtein distance measure to calculate the closeness of distance between two matching strings/units.
 SQL Matching is used on top of Fuzzy Matched records to ensure the correctness of mapping.
 
+## Requirements:-
+
+Before running the app server the following requirements must be fullfilled:-
+
+- .env file to be updated/ added under Connections package
+- creds.json to be added/ needed under UnitsDataDecoupler package
+- settings.json file must be created under main
+
 ## **Configuration Params:-**
 
 #### _**APPLICATION FRAMEWORK:** Flask 1.1.2_
 
-#### **1. Fuzzy Unit Mapping:- (version 2.0)**
+#### **1. Fuzzy Unit Mapping:- (version 2.2)**
 
 - **API END POINT** :- /track/api/v1/units-api-mapper
 

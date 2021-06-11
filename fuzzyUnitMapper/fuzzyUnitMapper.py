@@ -40,17 +40,13 @@ class FuzzyAutoMapper:
         # Fuzzy Mapping of Source and Track data set:-
         matcher = fuzzy_left_join(df_source, df_track, self.left, self.right)
 
-        # Load Fuzzy Matched Data ---> Stage:-
-        #matcher.to_sql(name=f"tia_{self.migration_phase}_unit_processing", con=self.stage, if_exists='replace', index=False)
-        #matcher.to_sql(name=f"tia_{self.migration_phase}_unit_processing", con=self.local, if_exists='replace', index=False)
-
         print("$ Fuzzy Unit Mapping: Complete $")
         return matcher
 
     def fuzzyUnitProcessor(self, matcher):
 
         print(f"$ Preparing fuzzy unit processing table: tia_{self.migration_phase}_unit_processing $")
-        data_dict = {'unit_stats_id': pd.Series([], dtype='int'),'folio': pd.Series([], dtype='int'), 
+        data_dict = {'unit_stats_id': pd.Series([], dtype='int'),'folio': pd.Series([], dtype='str'), 
                      'unit_name_src': pd.Series([], dtype='str'), 'unit_code_src': pd.Series([], dtype='str'), 
                      'unit_name_trk': pd.Series([], dtype='str'), 'unit_code_trk': pd.Series([], dtype='str'), 
                      'short_name_trk': pd.Series([], dtype='str'), 'cabin_id': pd.Series([], dtype='int')}
